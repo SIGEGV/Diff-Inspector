@@ -21,30 +21,24 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine as production
+FROM node:20-alpine as production
 
 WORKDIR /app
 
-# Copy built files
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Copy nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Install Node.js for running preview server (Railway deployment)
-RUN apk add --no-cache nodejs npm
-
-# Copy package files and install production dependencies
+# Copy package files
 COPY package*.json ./
-RUN npm install --production
 
-# Copy source for preview server
+# Install ALL dependencies (including vite for preview server)
+RUN npm install
+
+# Copy built files and source
 COPY --from=build /app/dist ./dist
 COPY vite.config.ts ./
+COPY index.html ./
 
 # Railway provides PORT environment variable
 ENV PORT=3000
 EXPOSE $PORT
 
 # Use Vite preview server for Railway (supports dynamic PORT)
-CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT:-3000}"]
+CMD ["sh", "-c", "npx vite preview --host 0.0.0.0 --port ${PORT:-3000}"]
