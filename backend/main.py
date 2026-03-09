@@ -3,12 +3,31 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import difflib
 from typing import List, Dict, Optional
+import os
 
 app = FastAPI(title="Diff Checker API")
 
+# CORS configuration for Railway deployment
+# Update the frontend URL after deploying to Railway
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "http://localhost:5173",  # Vite dev server
+]
+
+# Add Railway frontend URL from environment variable if available
+railway_frontend_url = os.getenv("FRONTEND_URL")
+if railway_frontend_url:
+    allowed_origins.append(railway_frontend_url)
+    # Also add without trailing slash
+    allowed_origins.append(railway_frontend_url.rstrip("/"))
+
+# For development, allow all origins (remove in production)
+# Comment out the line below after adding your Railway frontend URL
+allowed_origins.append("*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
