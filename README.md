@@ -47,6 +47,38 @@ npm install
 npm run dev
 ```
 
+## Deployment
+
+### Railway (Recommended)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed Railway deployment instructions via CLI.
+
+Quick deploy:
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Login
+railway login
+
+# Deploy backend
+cd backend && railway up
+
+# Deploy frontend (set VITE_API_URL to your backend URL)
+cd ../frontend && railway up
+```
+
+### Docker Production
+
+Build production images:
+```bash
+# Backend
+docker build -t diffinspector-backend ./backend
+
+# Frontend
+docker build -t diffinspector-frontend --target production ./frontend
+```
+
 ## Usage
 
 1. Paste your original text in the left panel
@@ -68,3 +100,21 @@ Uses Python's difflib with Myers algorithm:
 - Time: O(ND) where N is sum of lengths, D is edit distance
 - Space: O(N)
 - Optimal for most real-world text comparisons
+
+## Environment Variables
+
+### Backend
+- `PORT` - Server port (default: 8000)
+- `PYTHONUNBUFFERED` - Python logging (default: 1)
+
+### Frontend
+- `VITE_API_URL` - Backend API URL (default: http://localhost:8000)
+- `PORT` - Server port (default: 3000)
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
